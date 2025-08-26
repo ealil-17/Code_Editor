@@ -1,87 +1,97 @@
 import java.io.*;
+import java.util.*;
 
 public class run {
-    public static String lang(String file_name){
-    
 
-        // This Function is for the filtering the file format from the name and return the Command
-        
-        String format=null; 
+    // This Function is for the filtering the file format from the name and return the Command
+    public static ArrayList<String> lang(String file_name){
+      
+        ArrayList<String> format=new ArrayList<>();
+
 
         if(file_name.endsWith(".py")){
-            format = "python3 "+file_name;  // PYTHON
+            format.add("python3 "+file_name);  // PYTHON
         }
 
         else if(file_name.endsWith(".c")){
-            format = "gcc "+ file_name + "-o "+ file_name.replace(".c", "") +" && ./"+  file_name.replace(".c", "");    // C
+            format.add("gcc "+ file_name + "-o "+ file_name.replace(".c", ""));
+            format.add("./"+  file_name.replace(".c", ""));    // C
         }
 
          else if(file_name.endsWith(".c++") || file_name.endsWith(".cpp")){
             if(file_name.endsWith(".c++")){
-            format = "gcc "+ file_name + " -o "+ file_name.replace(".c++", "") +" && ./"+ file_name.replace(".c++", "");   //C++
+            format.add("gcc "+ file_name + " -o "+ file_name.replace(".c++", ""));
+            format.add("./"+ file_name.replace(".c++", ""));     //   C++
             }
             else if(file_name.endsWith(".cpp")){
-                format = "gcc "+ file_name + " -o "+ file_name.replace(".cpp", "") +" && ./"+ file_name.replace(".cpp", "");  //Cpp
+                format.add("gcc "+ file_name + " -o "+ file_name.replace(".cpp", ""));
+                format.add("./"+ file_name.replace(".cpp", ""));      //   Cpp
             }
         }
 
          else if(file_name.endsWith(".java")){
-            format = "javac "+ file_name + " && java "+ file_name.replace(".java", "");   // JAVA
+            format.add("javac "+ file_name );
+            format.add("java "+ file_name.replace(".java", ""));   // JAVA
         }
 
          else if(file_name.endsWith(".php")){
-            format = "php "+file_name;         //PHP
+            format.add("php "+file_name);         //PHP
         } 
 
         else if(file_name.endsWith(".go")){
-            format= "go run ./" + file_name;  // GO
+            format.add("go run ./" + file_name);  // GO
         }
         
         else {
-            return "Doesn't Support this file";
+            format.add("Doesn't Support this file");
         }
-
-        return format; 
+        return format;
+        
     }
 
+    // This function is to run the code in the terminal and return is output or error
+    public static ArrayList<String> execution(ArrayList<String> cmd){
 
-    public static String execution(String cmd){
-
-        // This function is to run the code in the terminal and return is output or error
-        
-        String s=null;
+        ArrayList<String> output = new ArrayList<String>();        
+        String s = null;
         Process process;
-        
        try {
-            process = Runtime.getRuntime().exec(cmd);
-
+            int i = 0;
+            while(i<2){
+            process = Runtime.getRuntime().exec(cmd.get(i));
             // Read standard output
-            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            while ((s = br.readLine()) != null)
-                System.out.println("OUT: " + s);
+            BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            while ((s = out.readLine()) != null){
+                //System.out.println("OUT: " + s);
+                output.add(s);                
+            }
 
             // Read error output
-            BufferedReader errBr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-            while ((s = errBr.readLine()) != null)
-                System.err.println("ERR: " + s);
+            BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            while ((s = err.readLine()) != null){
+                //System.err.println("ERR: " + s);
+                output.add(s);   
+            }
 
             process.waitFor();
-            System.out.println("exit: " + process.exitValue());
+           // System.out.println("exit: " + process.exitValue());
             process.destroy();
+            i++;
+        }
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
     
-        return s;
+        return output;
+
     }
-
-
     public static void main(String args[]) {
-        String code=lang("hello.java");
-        System.out.println("execute: "+ code);
+        ArrayList<String> code=lang("hello.java");
+        System.out.println("Going to execute this command: "+ code);
         System.out.println("executing......");
         System.out.println(execution(code));
-        
+        //execution(code);
         
     }
 }
