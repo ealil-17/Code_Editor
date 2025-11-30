@@ -89,8 +89,8 @@ class CodeExecutor {
         try {
             // Compile
             const compileResult = await this.runCommand('g++', [sourcePath, '-o', execPath], '');
-            if (compileResult.stderr && !compileResult.stdout) {
-                return { output: '', error: compileResult.stderr, executionTime: 0 };
+            if (compileResult.error && !compileResult.output) {
+                return { output: '', error: compileResult.error, exitCode: compileResult.exitCode, executionTime: compileResult.executionTime };
             }
 
             // Execute
@@ -109,8 +109,8 @@ class CodeExecutor {
         try {
             // Compile
             const compileResult = await this.runCommand('gcc', [sourcePath, '-o', execPath], '');
-            if (compileResult.stderr && !compileResult.stdout) {
-                return { output: '', error: compileResult.stderr, executionTime: 0 };
+            if (compileResult.error && !compileResult.output) {
+                return { output: '', error: compileResult.error, exitCode: compileResult.exitCode, executionTime: compileResult.executionTime };
             }
 
             // Execute
@@ -133,8 +133,8 @@ class CodeExecutor {
         try {
             // Compile
             const compileResult = await this.runCommand('javac', [sourcePath], '');
-            if (compileResult.stderr && !compileResult.stdout) {
-                return { output: '', error: compileResult.stderr, executionTime: 0 };
+            if (compileResult.error && !compileResult.output) {
+                return { output: '', error: compileResult.error, exitCode: compileResult.exitCode, executionTime: compileResult.executionTime };
             }
 
             // Execute
@@ -153,8 +153,8 @@ class CodeExecutor {
         try {
             // Compile TypeScript to JavaScript
             const compileResult = await this.runCommand('tsc', [tsPath, '--outDir', this.tempDir], '');
-            if (compileResult.stderr && !compileResult.stdout) {
-                return { output: '', error: compileResult.stderr, executionTime: 0 };
+            if (compileResult.error && !compileResult.output) {
+                return { output: '', error: compileResult.error, exitCode: compileResult.exitCode, executionTime: compileResult.executionTime };
             }
 
             // Execute the compiled JavaScript
@@ -209,8 +209,8 @@ class CodeExecutor {
         try {
             // Compile
             const compileResult = await this.runCommand('rustc', [sourcePath, '-o', execPath], '');
-            if (compileResult.stderr && !compileResult.stdout) {
-                return { output: '', error: compileResult.stderr, executionTime: 0 };
+            if (compileResult.error && !compileResult.output) {
+                return { output: '', error: compileResult.error, exitCode: compileResult.exitCode, executionTime: compileResult.executionTime };
             }
 
             // Execute

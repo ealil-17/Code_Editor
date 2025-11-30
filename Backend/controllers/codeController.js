@@ -1,5 +1,6 @@
 const codeExecutor = require('../services/codeExecutor');
 const languageService = require('../services/languageService');
+const errorSanitizer = require('../services/errorSanitizer');
 
 const executeCode = async (req, res, next) => {
     try {
@@ -34,11 +35,16 @@ const executeCode = async (req, res, next) => {
         // Execute the code
         const result = await codeExecutor.execute(language, code, input || '');
 
+        // Sanitize error messages before sending to client
+        const sanitizedError = errorSanitizer.sanitize(result.error, language);
+        const errorType = result.error ? errorSanitizer.getErrorType(result.error) : null;
+
         res.json({
             success: true,
             language,
             output: result.output,
-            error: result.error,
+            error: sanitizedError,
+            errorType: errorType,
             exitCode: result.exitCode,
             executionTime: result.executionTime
         });
@@ -50,13 +56,16 @@ const executeCode = async (req, res, next) => {
         if (error.message === 'Execution timed out') {
             return res.status(408).json({
                 success: false,
-                error: 'Code execution timed out. Please check for infinite loops or optimize your code.'
+                error: 'Code execution timed out. Please check for infinite loops or optimize your code.',
+                errorType: 'TIMEOUT'
             });
         }
 
+        // Sanitize unexpected errors
         res.status(500).json({
             success: false,
-            error: error.message || 'Code execution failed'
+            error: 'An error occurred while executing your code. Please try again.',
+            errorType: 'SERVER_ERROR'
         });
     }
 };
